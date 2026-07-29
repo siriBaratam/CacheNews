@@ -113,8 +113,8 @@ const PostCard = ({ post, onPostUpdated, cacheHit, cacheTime, onCommentClick, on
       <div className="flex flex-col items-center gap-1">
         <button
           onClick={handleUpvote}
-          className={`p-2 rounded-lg hover:bg-zinc-800 transition-all ${
-            hasUpvoted ? 'text-emerald-400 bg-emerald-500/10 shadow-[0_0_10px_rgba(16,185,129,0.1)]' : 'text-zinc-500 hover:text-zinc-300'
+          className={`p-2 rounded-lg transition-all ${
+            hasUpvoted ? 'text-emerald-400 bg-emerald-500/10 shadow-[0_0_10px_rgba(16,185,129,0.1)]' : 'text-zinc-500 hover:text-zinc-700 hover:bg-slate-200/60'
           }`}
           aria-label="Upvote"
         >
@@ -170,7 +170,7 @@ const PostCard = ({ post, onPostUpdated, cacheHit, cacheTime, onCommentClick, on
               {post.tags.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[10px] font-semibold text-zinc-300 uppercase tracking-wider"
+                  className="flex items-center gap-1 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 dark:bg-zinc-900 dark:border-zinc-800 text-[10px] font-semibold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider"
                 >
                   <Tag className="w-2.5 h-2.5 text-emerald-400" />
                   {tag.replace('#', '')}
@@ -188,7 +188,7 @@ const PostCard = ({ post, onPostUpdated, cacheHit, cacheTime, onCommentClick, on
           {/* Navigation to comments thread */}
           <button
             onClick={() => onCommentClick && onCommentClick(post._id)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800/40 hover:bg-zinc-800 text-zinc-300 transition-all border border-zinc-700/20 text-xs font-semibold"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800/40 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-all border border-slate-200 dark:border-zinc-700/20 text-xs font-semibold"
           >
             <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
             <span>Comments</span>
@@ -201,7 +201,7 @@ const PostCard = ({ post, onPostUpdated, cacheHit, cacheTime, onCommentClick, on
               className={`flex items-center justify-center p-1.5 rounded-lg border transition-all ${
                 isSaved
                   ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.15)] pulse-glow'
-                  : 'bg-zinc-800/40 border-zinc-700/20 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'
+                  : 'bg-slate-100 border-slate-200 dark:bg-zinc-800/40 dark:border-zinc-700/20 text-zinc-500 hover:text-zinc-700 hover:bg-slate-200 dark:hover:text-zinc-300 dark:hover:bg-zinc-800'
               }`}
               title={isSaved ? 'Remove bookmark' : 'Bookmark story'}
             >

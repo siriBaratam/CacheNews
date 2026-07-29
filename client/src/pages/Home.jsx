@@ -116,7 +116,7 @@ const Home = ({
         <div className="glass rounded-2xl overflow-hidden border border-zinc-800/80">
           <button
             onClick={() => setShowSubmitForm(!showSubmitForm)}
-            className="w-full px-5 py-4 flex items-center justify-between text-zinc-300 hover:text-white transition-colors text-xs font-bold uppercase tracking-wider bg-zinc-900/20"
+            className="w-full px-5 py-4 flex items-center justify-between text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors text-xs font-bold uppercase tracking-wider bg-slate-50/60 dark:bg-zinc-900/20"
           >
             <div className="flex items-center gap-2">
               <Plus className={`w-4 h-4 text-emerald-400 transition-transform duration-200 ${showSubmitForm ? 'rotate-45' : ''}`} />
@@ -126,7 +126,7 @@ const Home = ({
           </button>
 
           {showSubmitForm && (
-            <form onSubmit={handlePostSubmission} className="p-5 border-t border-zinc-800/60 bg-zinc-950/20 flex flex-col gap-4">
+            <form onSubmit={handlePostSubmission} className="p-5 border-t border-slate-200 dark:border-zinc-800/60 bg-slate-50/40 dark:bg-zinc-950/20 flex flex-col gap-4">
               <div className="flex flex-col gap-1">
                 <input
                   type="text"
@@ -134,7 +134,7 @@ const Home = ({
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full glass-input text-xs text-zinc-100 px-3.5 py-2.5 rounded-xl focus:outline-none"
+                  className="w-full glass-input text-xs px-3.5 py-2.5 rounded-xl focus:outline-none"
                 />
               </div>
 
@@ -145,7 +145,7 @@ const Home = ({
                   placeholder="Reference URL (https://...)"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  className="w-full glass-input text-xs text-zinc-100 pl-10 pr-4 py-2.5 rounded-xl focus:outline-none"
+                  className="w-full glass-input text-xs pl-10 pr-4 py-2.5 rounded-xl focus:outline-none"
                 />
               </div>
 
@@ -155,7 +155,7 @@ const Home = ({
                   placeholder="Write body text description (optional)..."
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  className="w-full glass-input text-xs text-zinc-100 pl-10 pr-4 py-3 rounded-xl h-24 resize-none focus:outline-none"
+                  className="w-full glass-input text-xs pl-10 pr-4 py-3 rounded-xl h-24 resize-none focus:outline-none"
                 />
               </div>
 
@@ -166,7 +166,7 @@ const Home = ({
                   placeholder="Tags (comma-separated: node, cache, ai)"
                   value={tagsInput}
                   onChange={(e) => setTagsInput(e.target.value)}
-                  className="w-full glass-input text-xs text-zinc-100 pl-10 pr-4 py-2.5 rounded-xl focus:outline-none"
+                  className="w-full glass-input text-xs pl-10 pr-4 py-2.5 rounded-xl focus:outline-none"
                 />
               </div>
 
@@ -187,15 +187,15 @@ const Home = ({
 
       {/* Feed Selectors & Telemetry summary */}
       <div className="flex items-center justify-between border-b border-zinc-800/80 pb-3 flex-wrap gap-2">
-        <div className="flex items-center gap-1 bg-zinc-900/60 p-1 rounded-xl border border-zinc-800/80">
+        <div className="flex items-center gap-1 bg-slate-100 dark:bg-zinc-900/60 p-1 rounded-xl border border-slate-200 dark:border-zinc-800/80">
           {['trending', 'rising', 'new'].map((type) => (
             <button
               key={type}
               onClick={() => handleFeedTypeChange(type)}
               className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
                 feedType === type
-                  ? 'text-emerald-400 bg-zinc-800/80 shadow-sm'
-                  : 'text-zinc-500 hover:text-zinc-300'
+                  ? 'text-emerald-400 bg-white dark:bg-zinc-800/80 shadow-sm'
+                  : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
               }`}
             >
               {type}

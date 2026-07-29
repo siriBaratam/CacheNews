@@ -49,7 +49,7 @@ const AuthModal = ({ isOpen, onClose, initialTab = 'login' }) => {
 
         {/* Title */}
         <div className="text-center mb-6">
-          <h2 className="text-lg font-black tracking-tight text-white mb-1 uppercase tracking-wider">
+          <h2 className="text-lg font-black tracking-tight text-zinc-900 dark:text-white mb-1 uppercase tracking-wider">
             {tab === 'login' ? 'Welcome Back' : 'Initialize Account'}
           </h2>
           <p className="text-xs text-zinc-400">
@@ -77,7 +77,7 @@ const AuthModal = ({ isOpen, onClose, initialTab = 'login' }) => {
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full glass-input text-xs text-zinc-200 pl-10 pr-4 py-3 rounded-xl focus:outline-none"
+                className="w-full glass-input text-xs pl-10 pr-4 py-3 rounded-xl focus:outline-none"
               />
             </div>
           )}

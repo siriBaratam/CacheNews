@@ -46,7 +46,9 @@ const Navbar = ({
       <div className="flex items-center gap-4">
         <button
           onClick={handleHomeClick}
-          className="flex items-center gap-2 text-base font-black tracking-tight text-white hover:text-emerald-400 transition-colors"
+          className={`flex items-center gap-2 text-base font-black tracking-tight transition-colors hover:text-emerald-400 ${
+            darkMode ? 'text-white' : 'text-zinc-900'
+          }`}
         >
           <Zap className="w-5 h-5 text-emerald-400 fill-emerald-400 pulse-glow" />
           <span>Cache News</span>
@@ -87,7 +89,9 @@ const Navbar = ({
             className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all ${
               currentView === 'saved'
                 ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20'
-                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40'
+                : darkMode
+                  ? 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40'
+                  : 'text-zinc-600 hover:text-zinc-900 hover:bg-slate-200/60'
             }`}
           >
             <BookMarked className="w-4 h-4" />
@@ -101,7 +105,9 @@ const Navbar = ({
           className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all ${
             currentView === 'analytics'
               ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20'
-              : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40'
+              : darkMode
+                ? 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40'
+                : 'text-zinc-600 hover:text-zinc-900 hover:bg-slate-200/60'
           }`}
         >
           <BarChart3 className="w-4 h-4" />
@@ -111,7 +117,11 @@ const Navbar = ({
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="p-2 rounded-lg hover:bg-zinc-800/60 text-zinc-400 hover:text-zinc-200 transition-colors"
+          className={`p-2 rounded-lg transition-colors ${
+            darkMode
+              ? 'hover:bg-zinc-800/60 text-zinc-400 hover:text-zinc-200'
+              : 'hover:bg-slate-200/60 text-zinc-500 hover:text-zinc-700'
+          }`}
           aria-label="Toggle theme"
         >
           {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}

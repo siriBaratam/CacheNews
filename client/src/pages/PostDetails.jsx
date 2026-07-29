@@ -115,7 +115,7 @@ const PostDetails = ({
   if (!post) {
     return (
       <div className="max-w-2xl mx-auto py-10 px-4">
-        <button onClick={onBack} className="flex items-center gap-1 text-xs font-bold text-zinc-400 hover:text-white mb-6 uppercase tracking-wider transition-colors">
+        <button onClick={onBack}        className="flex items-center gap-1 text-xs font-bold text-zinc-400 hover:text-zinc-900 dark:hover:text-white mb-6 uppercase tracking-wider transition-colors">
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Feed</span>
         </button>
@@ -132,7 +132,7 @@ const PostDetails = ({
       {/* Back button */}
       <button
         onClick={onBack}
-        className="flex items-center gap-1.5 text-xs font-bold text-zinc-500 hover:text-white mb-6 transition-colors uppercase tracking-wider"
+        className="flex items-center gap-1.5 text-xs font-bold text-zinc-500 hover:text-zinc-900 dark:hover:text-white mb-6 transition-colors uppercase tracking-wider"
       >
         <ArrowLeft className="w-4 h-4 text-emerald-400" />
         <span>Back to Stories</span>
@@ -150,7 +150,7 @@ const PostDetails = ({
 
         {/* Story Body Content */}
         {post.content && post.url && (
-          <div className="glass p-5 rounded-2xl border border-zinc-800/80 bg-zinc-950/15 leading-relaxed text-xs text-zinc-300 break-all whitespace-pre-wrap">
+          <div className="glass p-5 rounded-2xl border border-slate-200 dark:border-zinc-800/80 bg-slate-50/60 dark:bg-zinc-950/15 leading-relaxed text-xs text-zinc-600 dark:text-zinc-300 break-all whitespace-pre-wrap">
             {post.content}
           </div>
         )}

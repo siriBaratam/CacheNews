@@ -27,9 +27,9 @@ const CommentNode = ({ comment, onAddReply }) => {
         {comment.parentComment && (
           <CornerDownRight className="w-4 h-4 text-zinc-600 mt-1.5 flex-shrink-0" />
         )}
-        <div className="flex-1 glass bg-zinc-900/20 p-3.5 rounded-xl border border-zinc-800/80">
+        <div className="flex-1 glass bg-slate-50/60 dark:bg-zinc-900/20 p-3.5 rounded-xl border border-slate-200 dark:border-zinc-800/80">
           <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-            <span className="text-xs font-bold text-zinc-300">
+            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
               {comment.author?.username || 'anonymous'}
             </span>
             <span className="text-[10px] text-zinc-500">•</span>
@@ -45,12 +45,12 @@ const CommentNode = ({ comment, onAddReply }) => {
               </>
             )}
           </div>
-          <p className="text-xs text-zinc-300 leading-relaxed whitespace-pre-wrap break-all">
+          <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap break-all">
             {comment.content}
           </p>
 
           {user && (
-            <div className="flex items-center gap-2 mt-2 pt-2 border-t border-zinc-800/40">
+            <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-200 dark:border-zinc-800/40">
               <button
                 onClick={() => setShowReplyForm(!showReplyForm)}
                 className="flex items-center gap-1 text-[10px] font-bold text-zinc-400 hover:text-emerald-400 transition-colors"
@@ -70,7 +70,7 @@ const CommentNode = ({ comment, onAddReply }) => {
             value={replyText}
             onChange={(e) => setReplyText(e.target.value)}
             placeholder={`Reply to ${comment.author?.username || 'user'}...`}
-            className="flex-1 glass-input text-xs text-zinc-100 p-2.5 rounded-lg h-14 resize-none focus:outline-none"
+            className="flex-1 glass-input text-xs p-2.5 rounded-lg h-14 resize-none focus:outline-none"
           />
           <button
             type="submit"
@@ -85,7 +85,7 @@ const CommentNode = ({ comment, onAddReply }) => {
 
       {/* Recursive Render for Child Replies */}
       {comment.replies && comment.replies.length > 0 && (
-        <div className="ml-6 border-l border-zinc-800/80 pl-3 flex flex-col gap-1">
+        <div className="ml-6 border-l border-slate-200 dark:border-zinc-800/80 pl-3 flex flex-col gap-1">
           {comment.replies.map((reply) => (
             <CommentNode key={reply._id} comment={reply} onAddReply={onAddReply} />
           ))}
@@ -128,7 +128,7 @@ const CommentThread = ({ comments, onAddComment, onAuthRequired }) => {
 
   return (
     <div className="mt-8 border-t border-zinc-800/60 pt-6">
-      <h3 className="text-sm font-bold text-zinc-200 mb-4 flex items-center gap-2 uppercase tracking-wider">
+      <h3 className="text-sm font-bold text-zinc-700 dark:text-zinc-200 mb-4 flex items-center gap-2 uppercase tracking-wider">
         <MessageSquare className="w-4 h-4 text-emerald-400" />
         <span>Discussion ({getCommentsCount(comments)})</span>
       </h3>
@@ -140,7 +140,7 @@ const CommentThread = ({ comments, onAddComment, onAuthRequired }) => {
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
             placeholder="Participate in this discussion thread..."
-            className="w-full glass-input text-xs text-zinc-100 p-3 rounded-xl h-20 resize-none focus:outline-none"
+            className="w-full glass-input text-xs p-3 rounded-xl h-20 resize-none focus:outline-none"
           />
           <div className="flex justify-end">
             <button

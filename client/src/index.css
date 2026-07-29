@@ -99,19 +99,56 @@ body {
   box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
 }
 
+
 /* ============================================
    Light mode overrides for Tailwind zinc classes
    ============================================ */
+
+/* --- Text colors --- */
+html:not(.dark) .text-white   { color: #09090b !important; }
 html:not(.dark) .text-zinc-100 { color: #18181b !important; }
 html:not(.dark) .text-zinc-200 { color: #27272a !important; }
 html:not(.dark) .text-zinc-300 { color: #3f3f46 !important; }
 html:not(.dark) .text-zinc-400 { color: #52525b !important; }
 html:not(.dark) .text-zinc-500 { color: #71717a !important; }
-html:not(.dark) .bg-zinc-950  { background-color: #f8fafc !important; }
-html:not(.dark) .bg-zinc-900  { background-color: #f1f5f9 !important; }
-html:not(.dark) .bg-zinc-800  { background-color: #e2e8f0 !important; }
-html:not(.dark) .border-zinc-800 { border-color: #e2e8f0 !important; }
-html:not(.dark) .border-zinc-700 { border-color: #cbd5e1 !important; }
+html:not(.dark) .text-zinc-600 { color: #52525b !important; }
+
+/* --- Hover text --- */
+html:not(.dark) .hover\:text-white:hover  { color: #09090b !important; }
+html:not(.dark) .hover\:text-zinc-200:hover { color: #27272a !important; }
+html:not(.dark) .hover\:text-zinc-300:hover { color: #3f3f46 !important; }
+
+/* --- Solid backgrounds --- */
+html:not(.dark) .bg-zinc-950 { background-color: #f8fafc !important; }
+html:not(.dark) .bg-zinc-900 { background-color: #f1f5f9 !important; }
+html:not(.dark) .bg-zinc-800 { background-color: #e2e8f0 !important; }
+
+/* --- Opacity-variant backgrounds (Tailwind escapes / as \/) --- */
+html:not(.dark) .bg-zinc-900\/20 { background-color: rgba(241,245,249,0.5)  !important; }
+html:not(.dark) .bg-zinc-800\/40 { background-color: rgba(226,232,240,0.6)  !important; }
+html:not(.dark) .bg-zinc-800\/60 { background-color: rgba(226,232,240,0.8)  !important; }
+
+/* --- Hover backgrounds --- */
+html:not(.dark) .hover\:bg-zinc-800:hover     { background-color: #e2e8f0 !important; }
+html:not(.dark) .hover\:bg-zinc-800\/40:hover { background-color: rgba(226,232,240,0.6) !important; }
+html:not(.dark) .hover\:bg-zinc-800\/60:hover { background-color: rgba(226,232,240,0.8) !important; }
+
+/* --- Borders --- */
+html:not(.dark) .border-zinc-800    { border-color: #e2e8f0 !important; }
+html:not(.dark) .border-zinc-700    { border-color: #cbd5e1 !important; }
+html:not(.dark) .border-zinc-800\/40 { border-color: rgba(203,213,225,0.6) !important; }
+html:not(.dark) .border-zinc-800\/60 { border-color: rgba(203,213,225,0.7) !important; }
+html:not(.dark) .border-zinc-800\/80 { border-color: rgba(203,213,225,0.8) !important; }
+html:not(.dark) .border-zinc-700\/20 { border-color: rgba(203,213,225,0.4) !important; }
+
+/* --- Dividers (vertical/horizontal lines) --- */
+html:not(.dark) .bg-zinc-800.h-4   { background-color: #cbd5e1 !important; }
+html:not(.dark) .bg-zinc-800.w-px  { background-color: #cbd5e1 !important; }
+
+/* --- Placeholder text --- */
+html:not(.dark) .placeholder-zinc-600::placeholder { color: #94a3b8 !important; }
+
+
 
 /* ============================================
    Glowing text effects

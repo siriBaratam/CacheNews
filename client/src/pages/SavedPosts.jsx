@@ -51,7 +51,7 @@ const SavedPosts = ({
       {/* Back button */}
       <button
         onClick={onBack}
-        className="flex items-center gap-1.5 text-xs font-bold text-zinc-500 hover:text-white transition-colors uppercase tracking-wider"
+        className="flex items-center gap-1.5 text-xs font-bold text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors uppercase tracking-wider"
       >
         <ArrowLeft className="w-4 h-4 text-emerald-400" />
         <span>Back to Stories</span>
@@ -59,7 +59,7 @@ const SavedPosts = ({
 
       {/* Page header */}
       <div className="flex items-center justify-between border-b border-zinc-800/80 pb-3">
-        <h2 className="text-xs font-bold text-zinc-200 flex items-center gap-2 uppercase tracking-wider">
+        <h2 className="text-xs font-bold text-zinc-700 dark:text-zinc-200 flex items-center gap-2 uppercase tracking-wider">
           <BookMarked className="w-4.5 h-4.5 text-emerald-400" />
           <span>Bookmarked Stories ({posts.length})</span>
         </h2>
