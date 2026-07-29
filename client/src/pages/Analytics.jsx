@@ -1,20 +1,55 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Play, ShieldAlert, Cpu, Database, Zap, Sparkles, Trash2 } from 'lucide-react';
+import {
+  RefreshCw, Play, ShieldAlert, Cpu, Database,
+  Zap, Sparkles, Trash2, TrendingUp, Activity
+} from 'lucide-react';
 import api from '../api/axios';
 import AnalyticsChart from '../components/AnalyticsChart';
+import { useTheme } from '../context/ThemeContext';
 
+/* ─── Tiny reusable KPI card ─────────────────────────────────── */
+const KpiCard = ({ label, value, sub, icon: Icon, iconColor, accentClass, darkMode }) => (
+  <div className={`glass p-4 rounded-2xl border flex flex-col gap-2 relative overflow-hidden group transition-all hover:-translate-y-0.5 ${
+    darkMode ? 'border-zinc-800/80' : 'border-slate-200'
+  }`}>
+    {/* Accent top bar */}
+    <div className={`absolute top-0 left-0 right-0 h-[2px] ${accentClass}`} />
+
+    <div className="flex items-start justify-between">
+      <span className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-zinc-500' : 'text-slate-400'}`}>
+        {label}
+      </span>
+      <div className={`p-1.5 rounded-lg ${darkMode ? 'bg-zinc-800/60' : 'bg-slate-100'}`}>
+        <Icon className={`w-4 h-4 ${iconColor}`} />
+      </div>
+    </div>
+
+    <span className={`text-2xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+      {value}
+    </span>
+
+    {sub && (
+      <span className={`text-[10px] font-medium leading-relaxed ${darkMode ? 'text-zinc-500' : 'text-slate-400'}`}>
+        {sub}
+      </span>
+    )}
+  </div>
+);
+
+/* ─── Main Analytics Page ─────────────────────────────────────── */
 const Analytics = ({ requestHistory, onRecordRequest, onClearHistory }) => {
-  const [stats, setStats] = useState(null);
+  const { darkMode } = useTheme();
+  const [stats, setStats]               = useState(null);
   const [loadingStats, setLoadingStats] = useState(true);
-  const [simulating, setSimulating] = useState(false);
-  const [simProgress, setSimProgress] = useState(0);
+  const [simulating, setSimulating]     = useState(false);
+  const [simProgress, setSimProgress]   = useState(0);
 
   const fetchStats = async () => {
     try {
       const res = await api.get('/analytics/cache-stats');
       setStats(res.data);
-    } catch (error) {
-      console.error('Failed to load telemetry stats:', error);
+    } catch (err) {
+      console.error('Failed to load telemetry stats:', err);
     } finally {
       setLoadingStats(false);
     }
@@ -22,7 +57,6 @@ const Analytics = ({ requestHistory, onRecordRequest, onClearHistory }) => {
 
   useEffect(() => {
     fetchStats();
-    // Poll stats every 3 seconds to keep CPU/Memory/Eviction counters sync'd
     const interval = setInterval(fetchStats, 3000);
     return () => clearInterval(interval);
   }, []);
@@ -33,60 +67,59 @@ const Analytics = ({ requestHistory, onRecordRequest, onClearHistory }) => {
     setSimProgress(0);
 
     const totalRequests = 1000;
-    const chunkSize = 40; // execute 40 parallel calls in batches
+    const chunkSize     = 40;
     const routes = [
-      '/posts/trending',
-      '/posts/rising',
-      '/posts/new',
-      '/posts/search?q=node',
-      '/posts/search?q=react',
-      '/posts/search?q=cache'
+      '/posts/trending', '/posts/rising', '/posts/new',
+      '/posts/search?q=node', '/posts/search?q=react', '/posts/search?q=cache'
     ];
 
     for (let i = 0; i < totalRequests; i += chunkSize) {
-      const promises = [];
       const batchSize = Math.min(chunkSize, totalRequests - i);
-
-      for (let j = 0; j < batchSize; j++) {
+      const promises  = Array.from({ length: batchSize }, () => {
         const route = routes[Math.floor(Math.random() * routes.length)];
-        const fireRequest = async () => {
+        return (async () => {
           const start = performance.now();
           try {
-            const res = await api.get(route);
-            const hit = res.headers['x-cache'] || 'MISS';
-            const latencyStr = res.headers['x-response-time'];
-            const latency = latencyStr ? parseFloat(latencyStr.replace('ms', '')) : parseFloat((performance.now() - start).toFixed(3));
-            
+            const res     = await api.get(route);
+            const hit     = res.headers['x-cache'] || 'MISS';
+            const latStr  = res.headers['x-response-time'];
+            const latency = latStr
+              ? parseFloat(latStr.replace('ms', ''))
+              : parseFloat((performance.now() - start).toFixed(3));
             onRecordRequest(route, latency, hit === 'HIT');
-          } catch (e) {
-            console.error('Sim request failed:', e);
-          }
-        };
-        promises.push(fireRequest());
-      }
+          } catch (e) { /* silent */ }
+        })();
+      });
 
       await Promise.all(promises);
       setSimProgress(prev => prev + batchSize);
-      
-      // Delay slightly between batches to animate the telemetry chart
-      await new Promise(resolve => setTimeout(resolve, 80));
+      await new Promise(r => setTimeout(r, 80));
     }
 
     await fetchStats();
     setSimulating(false);
   };
 
-  // Math aggregates from local logs history
-  const hitsLog = requestHistory.filter(r => r.hit);
-  const missesLog = requestHistory.filter(r => !r.hit);
+  /* ── Computed metrics ── */
+  const hitsLog    = requestHistory.filter(r => r.hit);
+  const missesLog  = requestHistory.filter(r => !r.hit);
+  const totalReqs  = requestHistory.length;
 
-  const avgHitLatency = hitsLog.length > 0 
-    ? (hitsLog.reduce((acc, curr) => acc + curr.latency, 0) / hitsLog.length).toFixed(3)
-    : '0.000';
+  const avgHitLatency = hitsLog.length > 0
+    ? (hitsLog.reduce((a, c) => a + c.latency, 0) / hitsLog.length).toFixed(3)
+    : '—';
 
-  const avgMissLatency = missesLog.length > 0 
-    ? (missesLog.reduce((acc, curr) => acc + curr.latency, 0) / missesLog.length).toFixed(2)
-    : '0.00';
+  const avgMissLatency = missesLog.length > 0
+    ? (missesLog.reduce((a, c) => a + c.latency, 0) / missesLog.length).toFixed(2)
+    : '—';
+
+  const speedup = (avgHitLatency !== '—' && avgMissLatency !== '—')
+    ? (parseFloat(avgMissLatency) / parseFloat(avgHitLatency)).toFixed(1)
+    : '—';
+
+  const hitPct = totalReqs > 0
+    ? Math.round((hitsLog.length / totalReqs) * 100)
+    : 0;
 
   const mappedChartData = requestHistory.map((item, idx) => ({
     index: idx + 1,
@@ -95,126 +128,147 @@ const Analytics = ({ requestHistory, onRecordRequest, onClearHistory }) => {
     path: item.path
   }));
 
+  const border = darkMode ? 'border-zinc-800/80' : 'border-slate-200';
+  const subText = darkMode ? 'text-zinc-500' : 'text-slate-400';
+
   return (
     <div className="max-w-4xl mx-auto py-6 px-4 flex flex-col gap-6">
-      {/* Title */}
-      <div className="flex items-center justify-between border-b border-zinc-800/85 pb-4 flex-wrap gap-4">
+
+      {/* ── Header ── */}
+      <div className={`flex items-start justify-between border-b ${border} pb-5 flex-wrap gap-4`}>
         <div>
-          <h2 className="text-base font-black tracking-wider text-zinc-100 flex items-center gap-2 uppercase">
+          <h2 className={`text-lg font-black tracking-tight flex items-center gap-2 uppercase ${
+            darkMode ? 'text-zinc-100' : 'text-zinc-900'
+          }`}>
             <Sparkles className="w-5 h-5 text-emerald-400 fill-emerald-400/20" />
-            <span>Cache Analytics & Telemetry</span>
+            Cache Telemetry
           </h2>
-          <p className="text-[10px] text-zinc-500 font-semibold uppercase mt-1">
-            Visualizing the difference between Mongoose db lookups and custom O(1) in-memory lookups.
+          <p className={`text-[10px] font-semibold uppercase mt-1 max-w-md ${subText}`}>
+            Live diagnostics comparing O(1) in-memory cache hits vs Mongoose DB roundtrips.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {requestHistory.length > 0 && (
             <button
               onClick={onClearHistory}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-red-950/20 text-red-400 border border-red-900/30 text-[10px] font-bold uppercase transition-all hover:bg-red-950/40"
-              title="Clear Chart Logs"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-bold uppercase transition-all hover:bg-red-500/20"
             >
               <Trash2 className="w-3.5 h-3.5" />
-              <span>Clear Logs</span>
+              Clear Logs
             </button>
           )}
-
           <button
             onClick={fetchStats}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-800/40 text-zinc-400 border border-zinc-700/20 text-[10px] font-bold uppercase transition-all hover:bg-zinc-800"
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border text-[10px] font-bold uppercase transition-all ${
+              darkMode
+                ? 'bg-zinc-800/40 text-zinc-400 border-zinc-700/20 hover:bg-zinc-800'
+                : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200'
+            }`}
           >
             <RefreshCw className="w-3.5 h-3.5" />
-            <span>Sync</span>
+            Sync
           </button>
         </div>
       </div>
 
-      {/* KPI Cards Grid */}
+      {/* ── KPI Cards ── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {/* KPI 1: Hit Rate */}
-        <div className="glass p-4 rounded-xl border border-zinc-800/80 flex flex-col gap-1 relative overflow-hidden">
-          <div className="absolute right-3 top-3">
-            <Zap className="w-5 h-5 text-emerald-400 fill-emerald-400/10 opacity-70" />
-          </div>
-          <span className="text-[10px] text-zinc-500 font-bold uppercase">Hit Ratio</span>
-          <span className="text-2xl font-black text-white glow-emerald">
-            {stats ? `${stats.hitRatio}%` : '0.00%'}
-          </span>
-          <span className="text-[9px] text-zinc-400 font-medium">
-            {stats ? `Hits: ${stats.hits} | Misses: ${stats.misses}` : 'No connections'}
-          </span>
-        </div>
-
-        {/* KPI 2: Heap Footprint */}
-        <div className="glass p-4 rounded-xl border border-zinc-800/80 flex flex-col gap-1 relative overflow-hidden">
-          <div className="absolute right-3 top-3">
-            <Cpu className="w-5 h-5 text-emerald-400 opacity-70" />
-          </div>
-          <span className="text-[10px] text-zinc-500 font-bold uppercase">RAM Footprint</span>
-          <span className="text-2xl font-black text-white">
-            {stats ? `${stats.heapUsedMB} MB` : '0.00 MB'}
-          </span>
-          <span className="text-[9px] text-zinc-400 font-medium">
-            {stats ? `Total Heap: ${stats.heapTotalMB} MB` : 'Estimating...'}
-          </span>
-        </div>
-
-        {/* KPI 3: Eviction Count */}
-        <div className="glass p-4 rounded-xl border border-zinc-800/80 flex flex-col gap-1 relative overflow-hidden">
-          <div className="absolute right-3 top-3">
-            <ShieldAlert className="w-5 h-5 text-amber-500 opacity-70" />
-          </div>
-          <span className="text-[10px] text-zinc-500 font-bold uppercase">Eviction Count</span>
-          <span className="text-2xl font-black text-white">
-            {stats ? stats.evictions : 0}
-          </span>
-          <span className="text-[9px] text-zinc-400 font-medium">
-            {stats ? `Current Items: ${stats.itemCount}` : 'No capacity logs'}
-          </span>
-        </div>
-
-        {/* KPI 4: Cache Latency */}
-        <div className="glass p-4 rounded-xl border border-zinc-800/80 flex flex-col gap-1 relative overflow-hidden">
-          <div className="absolute right-3 top-3">
-            <Database className="w-5 h-5 text-amber-500 opacity-70" />
-          </div>
-          <span className="text-[10px] text-zinc-500 font-bold uppercase">Latencies (Avg)</span>
-          <div className="flex flex-col">
-            <span className="text-xs font-bold text-emerald-400">
-              HIT: {avgHitLatency} ms
-            </span>
-            <span className="text-xs font-bold text-amber-400">
-              MISS: {avgMissLatency} ms
-            </span>
-          </div>
-          <span className="text-[9px] text-zinc-400 font-medium">
-            Computed from active logs
-          </span>
-        </div>
+        <KpiCard
+          darkMode={darkMode}
+          label="Cache Hit Ratio"
+          value={stats ? `${stats.hitRatio}%` : '—'}
+          sub={stats ? `${stats.hits} hits · ${stats.misses} misses` : 'Polling...'}
+          icon={Zap}
+          iconColor="text-emerald-400"
+          accentClass="bg-gradient-to-r from-emerald-500 to-emerald-400"
+        />
+        <KpiCard
+          darkMode={darkMode}
+          label="Heap Used"
+          value={stats ? `${stats.heapUsedMB} MB` : '—'}
+          sub={stats ? `Total heap: ${stats.heapTotalMB} MB` : 'Estimating...'}
+          icon={Cpu}
+          iconColor="text-sky-400"
+          accentClass="bg-gradient-to-r from-sky-500 to-sky-400"
+        />
+        <KpiCard
+          darkMode={darkMode}
+          label="LRU Evictions"
+          value={stats ? stats.evictions : 0}
+          sub={stats ? `${stats.itemCount} items in cache` : 'No eviction data'}
+          icon={ShieldAlert}
+          iconColor="text-amber-400"
+          accentClass="bg-gradient-to-r from-amber-500 to-amber-400"
+        />
+        <KpiCard
+          darkMode={darkMode}
+          label="Avg Latencies"
+          value={speedup !== '—' ? `${speedup}×` : '—'}
+          sub={`HIT: ${avgHitLatency}ms · MISS: ${avgMissLatency}ms`}
+          icon={Database}
+          iconColor="text-violet-400"
+          accentClass="bg-gradient-to-r from-violet-500 to-violet-400"
+        />
       </div>
 
-      {/* Live Stream Line Graph */}
-      <div className="glass p-5 rounded-2xl border border-zinc-800/80 flex flex-col gap-4">
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div className="flex flex-col">
-            <h3 className="text-xs font-bold text-zinc-200 uppercase tracking-wide">Live Response Time Streaming</h3>
-            <span className="text-[9px] text-zinc-500 font-semibold uppercase mt-0.5">
-              Response time chart. Green dots are <span className="text-emerald-400">Hits</span>, amber dots are <span className="text-amber-400">DB lookups</span>.
-            </span>
+      {/* ── Request Stats Bar ── */}
+      {totalReqs > 0 && (
+        <div className={`glass rounded-2xl border ${border} p-4 flex flex-col gap-3`}>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <Activity className="w-4 h-4 text-emerald-400" />
+              <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                Request Breakdown
+              </span>
+            </div>
+            <div className="flex items-center gap-4 text-[10px] font-bold uppercase">
+              <span className={darkMode ? 'text-zinc-500' : 'text-slate-400'}>
+                Total: <span className={darkMode ? 'text-zinc-200' : 'text-zinc-700'}>{totalReqs.toLocaleString()}</span>
+              </span>
+              <span className="text-emerald-400">⚡ {hitsLog.length.toLocaleString()} hits</span>
+              <span className="text-amber-400">⏱ {missesLog.length.toLocaleString()} misses</span>
+            </div>
           </div>
 
-          {/* Simulate 1000 requests */}
+          {/* Hit / Miss visual bar */}
+          <div className={`w-full h-2.5 rounded-full overflow-hidden ${darkMode ? 'bg-zinc-800' : 'bg-slate-200'}`}>
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-700"
+              style={{ width: `${hitPct}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-[9px] font-bold uppercase">
+            <span className="text-emerald-400">{hitPct}% cache hits</span>
+            <span className="text-amber-400">{100 - hitPct}% db misses</span>
+          </div>
+        </div>
+      )}
+
+      {/* ── Live Chart Panel ── */}
+      <div className={`glass rounded-2xl border ${border} p-5 flex flex-col gap-4`}>
+        {/* Chart header */}
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h3 className={`text-xs font-bold uppercase tracking-wide ${darkMode ? 'text-zinc-200' : 'text-zinc-700'}`}>
+              Live Response Time Stream
+            </h3>
+            <p className={`text-[9px] font-semibold uppercase mt-0.5 ${subText}`}>
+              <span className="text-emerald-400">● Green</span> = Cache Hit &nbsp;·&nbsp;
+              <span className="text-amber-400">● Amber</span> = DB Roundtrip &nbsp;·&nbsp;
+              <span className="text-violet-400">— Purple</span> = Average
+            </p>
+          </div>
+
           <button
             onClick={runSimulation}
             disabled={simulating}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase transition-all shadow-[0_0_12px_rgba(16,185,129,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase transition-all shadow-[0_0_16px_rgba(16,185,129,0.25)] disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {simulating ? (
               <>
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                <span>Simulating... ({simProgress}/1000)</span>
+                <span>{simProgress} / 1,000</span>
               </>
             ) : (
               <>
@@ -225,12 +279,33 @@ const Analytics = ({ requestHistory, onRecordRequest, onClearHistory }) => {
           </button>
         </div>
 
+        {/* Simulation Progress Bar */}
+        {simulating && (
+          <div className={`w-full h-1.5 rounded-full overflow-hidden ${darkMode ? 'bg-zinc-800' : 'bg-slate-200'}`}>
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400 transition-all duration-150"
+              style={{ width: `${(simProgress / 1000) * 100}%` }}
+            />
+          </div>
+        )}
+
+        {/* Chart or Empty State */}
         {mappedChartData.length === 0 ? (
-          <div className="w-full h-72 rounded-2xl bg-zinc-950/60 border border-zinc-800 flex items-center justify-center text-zinc-600 text-xs font-semibold">
-            No active query logs. Browse the app or run simulation.
+          <div className={`w-full h-72 rounded-2xl border flex flex-col items-center justify-center gap-3 ${
+            darkMode
+              ? 'bg-zinc-950/60 border-zinc-800'
+              : 'bg-slate-50/80 border-slate-200'
+          }`}>
+            <TrendingUp className={`w-8 h-8 ${darkMode ? 'text-zinc-700' : 'text-slate-300'}`} />
+            <p className={`text-xs font-bold ${darkMode ? 'text-zinc-600' : 'text-slate-400'}`}>
+              No logs yet
+            </p>
+            <p className={`text-[10px] ${darkMode ? 'text-zinc-700' : 'text-slate-300'}`}>
+              Browse the feed or click Simulate to begin.
+            </p>
           </div>
         ) : (
-          <AnalyticsChart data={mappedChartData} />
+          <AnalyticsChart data={mappedChartData} darkMode={darkMode} />
         )}
       </div>
     </div>
