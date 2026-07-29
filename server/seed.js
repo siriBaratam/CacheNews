@@ -1,15 +1,19 @@
 import mongoose from 'mongoose';
+import dns from 'dns';
 import dotenv from 'dotenv';
 import User from './models/User.js';
 import Post from './models/Post.js';
 import Comment from './models/Comment.js';
+
+// Fix: Windows DNS Client refuses TCP SRV lookups. Use Google DNS instead.
+dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 dotenv.config();
 
 const seedData = async () => {
   try {
     const connStr = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/cache-news';
-    await mongoose.connect(connStr);
+    await mongoose.connect(connStr, { family: 4 });
     console.log('Connected to MongoDB for seeding...');
 
     // Clear existing records

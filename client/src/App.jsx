@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { useTheme } from './context/ThemeContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import PostDetails from './pages/PostDetails';
@@ -9,6 +10,7 @@ import Analytics from './pages/Analytics';
 import AuthModal from './components/AuthModal';
 
 function AppContent() {
+  const { darkMode } = useTheme();
   const [currentView, setCurrentView] = useState('home'); // 'home' | 'post-details' | 'saved' | 'analytics'
   const [selectedPostId, setSelectedPostId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -52,7 +54,9 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 selection:bg-emerald-500/30 transition-colors duration-300 relative">
+    <div className={`min-h-screen selection:bg-emerald-500/30 transition-colors duration-300 relative ${
+      darkMode ? 'bg-zinc-950 text-zinc-100' : 'bg-slate-50 text-zinc-900'
+    }`}>
       {/* Decorative gradient overlay */}
       <div className="absolute top-0 left-0 right-0 h-[400px] bg-[radial-gradient(ellipse_60%_40%_at_50%_-10%,rgba(16,185,129,0.06),rgba(255,255,255,0))] pointer-events-none" />
 

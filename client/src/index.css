@@ -2,50 +2,95 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Core Design System Settings */
+/* ============================================
+   CSS VARIABLES — Dark Mode (default)
+   ============================================ */
+:root {
+  --bg-primary: #09090b;
+  --bg-secondary: #18181b;
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(15, 15, 20, 0.75);
+  --glass-card-bg: rgba(20, 20, 25, 0.6);
+  --glass-card-hover: rgba(20, 20, 25, 0.85);
+  --glass-input-bg: rgba(9, 9, 11, 0.6);
+  --scrollbar-track: #09090b;
+  --scrollbar-thumb: #27272a;
+}
+
+/* ============================================
+   CSS VARIABLES — Light Mode
+   ============================================ */
+html:not(.dark) {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --text-primary: #09090b;
+  --text-secondary: #52525b;
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.80);
+  --glass-card-bg: rgba(255, 255, 255, 0.65);
+  --glass-card-hover: rgba(255, 255, 255, 0.90);
+  --glass-input-bg: rgba(248, 250, 252, 0.8);
+  --scrollbar-track: #f1f5f9;
+  --scrollbar-thumb: #cbd5e1;
+}
+
+/* ============================================
+   Core Design System
+   ============================================ */
 body {
   margin: 0;
-  background-color: #09090b; /* zinc-950 background */
-  color: #f4f4f5; /* zinc-100 text */
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Glassmorphism Styles */
+/* ============================================
+   Glassmorphism Styles
+   ============================================ */
 .glass {
-  background: rgba(15, 15, 20, 0.75);
+  background: var(--glass-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-subtle);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .glass-card {
-  background: rgba(20, 20, 25, 0.6);
+  background: var(--glass-card-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card:hover {
   border-color: rgba(16, 185, 129, 0.25);
-  background: rgba(20, 20, 25, 0.85);
+  background: var(--glass-card-hover);
   box-shadow: 0 10px 30px -15px rgba(16, 185, 129, 0.15);
   transform: translateY(-2px);
 }
 
 .glass-emerald {
-  background: rgba(16, 185, 129, 0.03);
+  background: rgba(16, 185, 129, 0.05);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(16, 185, 129, 0.18);
 }
 
 .glass-input {
-  background: rgba(9, 9, 11, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--glass-input-bg);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
   transition: all 0.2s ease;
+}
+
+.glass-input::placeholder {
+  color: var(--text-secondary);
 }
 
 .glass-input:focus {
@@ -54,7 +99,23 @@ body {
   box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
 }
 
-/* Glowing text effects */
+/* ============================================
+   Light mode overrides for Tailwind zinc classes
+   ============================================ */
+html:not(.dark) .text-zinc-100 { color: #18181b !important; }
+html:not(.dark) .text-zinc-200 { color: #27272a !important; }
+html:not(.dark) .text-zinc-300 { color: #3f3f46 !important; }
+html:not(.dark) .text-zinc-400 { color: #52525b !important; }
+html:not(.dark) .text-zinc-500 { color: #71717a !important; }
+html:not(.dark) .bg-zinc-950  { background-color: #f8fafc !important; }
+html:not(.dark) .bg-zinc-900  { background-color: #f1f5f9 !important; }
+html:not(.dark) .bg-zinc-800  { background-color: #e2e8f0 !important; }
+html:not(.dark) .border-zinc-800 { border-color: #e2e8f0 !important; }
+html:not(.dark) .border-zinc-700 { border-color: #cbd5e1 !important; }
+
+/* ============================================
+   Glowing text effects
+   ============================================ */
 .glow-emerald {
   text-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
 }
@@ -63,18 +124,20 @@ body {
   text-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
 }
 
-/* Custom scrollbar */
+/* ============================================
+   Custom scrollbar
+   ============================================ */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #09090b;
+  background: var(--scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: var(--scrollbar-thumb);
   border-radius: 9999px;
 }
 
@@ -82,7 +145,9 @@ body {
   background: #10b981;
 }
 
-/* Micro-animations */
+/* ============================================
+   Micro-animations
+   ============================================ */
 @keyframes pulse-glow {
   0%, 100% {
     opacity: 1;
@@ -106,3 +171,4 @@ body {
 .spin-slow {
   animation: spin-slow 20s infinite linear;
 }
+
