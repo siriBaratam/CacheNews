@@ -8,7 +8,8 @@ const postSchema = new mongoose.Schema({
   },
   url: {
     type: String,
-    trim: true
+    trim: true,
+    required: true
   },
   content: {
     type: String
